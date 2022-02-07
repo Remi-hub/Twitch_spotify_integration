@@ -1,3 +1,6 @@
+require('dotenv').config()
+
+
 let currentTrack = {
   trackName: "",
   artist: "",
@@ -16,7 +19,7 @@ const trackCoverUrl = document.getElementById("track-url-cover")
 
 let myHeaders = new Headers();
 myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-myHeaders.append("Authorization", "Basic NGI3YzU0MzZlMjgwNDM0Zjg0NGVkYzE3NGVmMzNlNmE6NmMxNzM0OTJhODgxNGJlYzg0YWI4ZDFjNDJjNTlkZWU=");
+myHeaders.append("Authorization", process.env["BASIC64_AUTHORIZATION "]);
 myHeaders.append("Cookie", "__Host-device_id=AQBjxVEe2baK33vxa608ibFQ_6uNKMae8rrsaAiENGBrFqJymFrj06ys0WqDQ4hgXjWwLSIXC8zG4mA3-qANtmzWxiix_6D7Fjg; sp_aor=React; sp_tr=false");
 
 let urlencoded = new URLSearchParams();
