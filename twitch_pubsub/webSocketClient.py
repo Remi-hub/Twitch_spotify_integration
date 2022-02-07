@@ -16,9 +16,22 @@ def get_user_input(response):
     response = response["data"]["message"]
     response = json.loads(response)
     if "user_input" in response["data"]["redemption"]:
-        return response["data"]["redemption"]["user_input"]
+        message = response["data"]["redemption"]["user_input"]
+        return message
     else:
         return None
+
+
+def print_user_name_and_input(name, input):
+    return print(f"{name} requested {input}")
+
+
+def get_reward_id(response):
+    message_in_response = response["data"]["message"]
+    message_in_response = json.loads(message_in_response)
+    reward_id = message_in_response["data"]["redemption"]["reward"]["id"]
+    print(reward_id)
+    return reward_id
 
 
 class WebSocketClient:
@@ -30,7 +43,8 @@ class WebSocketClient:
     async def connect(self):
         """
         Connecting to webSocket server
-        websockets.client.connect returns a WebSocketClientProtocol, which is used to send and receive messages
+        websockets.client.connect returns a WebSocketClientProtocol,
+        which is used to send and receive messages
         """
         self.connection = await websockets.connect("wss://pubsub-edge.twitch.tv")
         if self.connection.open:
@@ -67,18 +81,16 @@ class WebSocketClient:
                 if "data" in response:
                     message_in_response = response["data"]["message"]
                     message_in_response = json.loads(message_in_response)
-                    reward_id = message_in_response["data"]["redemption"]["reward"][
-                        "id"
-                    ]
-
+                    claimed_reward_id = message_in_response["data"]["redemption"]["reward"]["id"]
                     # if the requested id matches the following ids:
 
                     # play requested song :
-                    if reward_id == "86fab6d6-09f5-4506-a172-9dfb2a750aae":
+                    if claimed_reward_id == "86fab6d6-09f5-4506-a172-9dfb2a750aae":
                         spotify.play_music_requested(get_user_input(response))
 
+
                     # skip the current song :
-                    elif reward_id == "3d9b655e-9ddc-483a-9891-488ce9883ac7":
+                    elif claimed_reward_id == "3d9b655e-9ddc-483a-9891-488ce9883ac7":
                         spotify.skip_current_track()
 
             except websockets.exceptions.ConnectionClosed:
@@ -100,3 +112,4 @@ class WebSocketClient:
             except websockets.exceptions.ConnectionClosed:
                 print("Connection with server closed")
                 break
+
