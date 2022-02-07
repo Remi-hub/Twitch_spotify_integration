@@ -1,0 +1,133 @@
+.player {
+
+	width: 250px;
+	height: 100px;
+	background-color: #FEECE9;
+	margin-top: 50px;
+
+}
+
+#player {
+	display: flex;
+	height: 100%;
+}
+
+.left-side {
+	margin-left: 15px;
+	position: relative;
+	border-radius: 50% 0 0 50%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 175px;
+	background-color: #2C3333;
+
+}
+
+.right-side {
+	z-index: -1;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	align-content: center;
+	border-radius: 0 5% 5% 0;
+}
+
+
+#title {
+	z-index: 1;
+	width: 100%;
+
+}
+
+#track-name {
+	z-index: 1;
+	margin-top: 5px;
+	margin-right: 15px;
+	margin-bottom: 15px;
+	padding-bottom: 5px;
+	padding-left: 15px;
+	color: #F5F2E7;
+	font-family: 'Acme', sans-serif;
+	font-size: 26px;
+	text-overflow: ellipsis;
+}
+
+#track-artist {
+	z-index: 2;
+	padding-right: 13px;
+	padding-top: 69px;
+	color: #F5F2E7;
+	font-family: 'Acme', sans-serif;
+	font-size: 22px;
+	text-overflow: ellipsis;
+	display: flex;
+	flex-direction: column;
+	flex-wrap: nowrap;
+	justify-content: flex-end;
+	align-items: flex-end;
+	align-content: stretch;
+	position: absolute;
+
+}
+
+
+#track-url-cover {
+	z-index: 1;
+	border-radius: 50%;
+	width: 175px;
+	height: 175px;
+	animation: infinite-spin 6s infinite linear;
+}
+
+#inner-circle {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 2;
+	position: absolute;
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	background-color: #1c1a1a;
+}
+
+#hole {
+	z-index: 3;
+	position: absolute;
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
+	background-color: white;
+}
+
+@keyframes infinite-spin {
+	0% {
+		transform: rotate(0deg)
+	}
+
+	100% {
+		transform: rotate(360deg)
+	}
+}
+
+h3 {
+	visibility: hidden;
+}
+
+#bar-progress {
+	position: absolute;
+	width: 250px;
+	background-color: #395B64;
+	height: 100px;
+	border-radius: 0 5% 5% 0;
+}
+
+#bar {
+	z-index: 5;
+	width: 1%;
+	height: 100px;
+	background-color: #2C3333;
+	border-radius: 0 5% 5% 0;
+}
+
