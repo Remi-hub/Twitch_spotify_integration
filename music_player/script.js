@@ -1,4 +1,37 @@
-require('dotenv').config()
+// require('dotenv').config()
+
+let Base64Code;
+let SpotifyClientId;
+let SpotifyRefreshToken;
+
+function storeInformations(response){
+  let informations = {};
+  let lines = response.split("\n")
+  for (i = 0; i < lines.length; i++){
+    let line = lines[i].split(";")
+    if (line.length === 2){
+      informations[line[0]] = line[1]
+    }
+  }
+  Base64Code = informations['spotify_base_64']
+  SpotifyRefreshToken = informations['refresh_token']
+  SpotifyClientId = informations['client_id']
+}
+
+
+function retrieveInformation() {
+  var requestOptions = {
+    method: 'GET',
+    redirect: 'follow'
+  };
+
+  fetch("http://localhost:8080/informations.txt", requestOptions)
+      .then(response => response.text())
+      .then(result => storeInformations(result))
+      .catch(error => console.log('error', error));
+}
+
+retrieveInformation()
 
 
 let currentTrack = {
@@ -19,13 +52,12 @@ const trackCoverUrl = document.getElementById("track-url-cover")
 
 let myHeaders = new Headers();
 myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
-myHeaders.append("Authorization", process.env["BASIC64_AUTHORIZATION "]);
-myHeaders.append("Cookie", "__Host-device_id=AQBjxVEe2baK33vxa608ibFQ_6uNKMae8rrsaAiENGBrFqJymFrj06ys0WqDQ4hgXjWwLSIXC8zG4mA3-qANtmzWxiix_6D7Fjg; sp_aor=React; sp_tr=false");
+myHeaders.append("Authorization", "Basic" + Base64Code);
 
 let urlencoded = new URLSearchParams();
 urlencoded.append("grant_type", "refresh_token");
-urlencoded.append("refresh_token", "AQAkmHktN9YJP5YwHOCo1rJcw8xyR6yn6LOCTywf6Gso9eFG99CwjF2_B7Yu4Udb5BsUIrI--QjDhAG6rm62vUwcX-grmEguFnQ-_vjaY474tIJ7YzpdlToeyUNURfSo95I");
-urlencoded.append("client_id", "4b7c5436e280434f844edc174ef33e6a");
+urlencoded.append("refresh_token", SpotifyRefreshToken);
+urlencoded.append("client_id", SpotifyClientId);
 
 let requestOptions = {
   method: 'POST',
@@ -42,10 +74,12 @@ myHeadersForCurrentTrack.append("Access-Control-Allow-Origin", "*")
 async function getAccessToken() {
   // console.log("calling")
   await fetch("https://accounts.spotify.com/api/token", requestOptions)
+
       .then(response => response.json())
       .then(data => bearerToken = data["access_token"])
       .catch(error => console.log('error', error));
   console.log(bearerToken)
+
 }
 
 
@@ -56,31 +90,17 @@ let requestOptionsForCurrentTrack = {
 };
 let bearerToken;
 
-async function getCurrentlyPlaying(){
-  myHeadersForCurrentTrack.append("Authorization", `Bearer ${bearerToken}` );
-  await fetch("https://api.spotify.com/v1/me/player/currently-playing", requestOptionsForCurrentTrack)
-      .then(response => {console.log(response.text)
-        response.json()
-      })
-      .then(result => currentTrack = {...currentTrack,
-        trackName: result["item"]["name"],
-        artist: result["item"]["artists"][0]["name"].slice(0, 30),
-        duration: Math.round(result["item"]["duration_ms"] / 1000),
-        progression: Math.round(result["progress_ms"] / 1000),
-        urlCover: result["item"]["album"]["images"][0]["url"]
-      } )
-      .catch(error => console.log('error', error));
-
-}
 
 async function getCurrentlyPlayingTrackFromPython(){
   let myHeadersForCurrentTrack = new Headers();
   myHeadersForCurrentTrack.append("token", bearerToken)
+  console.log("LE BEARER TOKEN CEST CA :")
+  console.log(bearerToken)
   let requestOptionsForCurrentTrack = {
-  method: 'GET',
-  headers: myHeadersForCurrentTrack,
-  redirect: 'follow',
-};
+    method: 'GET',
+    headers: myHeadersForCurrentTrack,
+    redirect: 'follow',
+  };
   await fetch("http://localhost:8080/currently_playing", requestOptionsForCurrentTrack, )
       .then(response =>
           response.json()

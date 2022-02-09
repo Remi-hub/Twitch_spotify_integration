@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Get started</title>
+    <script src="static_spotify/script.js"></script>
+</head>
+<body>
+<p> Go to https://developer.spotify.com/dashboard/applications, Log in and in your dashboard, go to create an app, give it a name and a description and hit create
+then in your Edit settings panel in the redirect URIs section type http://localhost:8080/callbackspotify, hit ADD then at the bottom hit save.
+Be sure to copy your client ID from the app and paste it below
+</p>
+
+    <label for="spotify-id">Spotify client id:</label><br>
+
+    <input type="text" id="spotify-id" name="spotify-id"><br>
+
+     <button type="submit" onclick="sendForm()">Submit</button>
+
+</body>
+</html>

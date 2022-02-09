@@ -9,36 +9,63 @@ from threading import Thread
 
 load_dotenv()
 
-SPOTIFY_CODE = os.getenv("SPOTIFY_CODE")
-BASIC64_AUTHORIZATION = os.getenv("BASIC64_AUTHORIZATION")
-REDIRECT_URI = os.getenv("REDIRECT_URI")
-REFRESH_TOKEN = os.getenv("REFRESH_TOKEN")
-SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
+# BASIC64_AUTHORIZATION = os.getenv("BASIC64_AUTHORIZATION")
+# REFRESH_TOKEN = os.getenv("REFRESH_TOKEN")
+# SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 ACCESS_TOKEN = None
 LAST_TIME_REFRESH = None
+
+
+def write_files(filename, values, keys):
+    with open("music_player/" + filename, "w") as f:
+        for i in range(len(values)):
+            f.write(keys[i] + ";" + values[i] + "\n")
+        f.close()
+
+
+def read_informations(key):
+    informations = {}
+    with open("music_player/informations.txt", 'r') as f:
+        for line in f:
+            split_line = line.split(";")
+            if len(split_line) == 2:
+                informations[split_line[0]] = split_line[1].strip("\n")
+        f.close()
+        if key in informations:
+            return informations[key]
+        return None
 
 
 def refreshed_token(is_init=True):
     global ACCESS_TOKEN
     global LAST_TIME_REFRESH
 
+    # execute this if code when true
     if is_init:
         LAST_TIME_REFRESH = datetime.now()
         url = "https://accounts.spotify.com/api/token"
 
-        payload = f'grant_type=refresh_token&refresh_token={REFRESH_TOKEN}&client_id={SPOTIFY_CLIENT_ID}'
+        payload = f'grant_type=refresh_token&refresh_token={read_informations("refresh_token")}' \
+                  f'&client_id={read_informations("client_id")}'
         headers = {
-            'Authorization': f'{BASIC64_AUTHORIZATION}',
+            'Authorization': f'Basic {read_informations("spotify_base_64")}',
             'Content-Type': 'application/x-www-form-urlencoded'
         }
-
+        # print(read_informations("client_id"))
+        # print(read_informations("refresh_token"))
+        # print(read_informations("spotify_base_64"))
         response = requests.request("POST", url, headers=headers, data=payload)
         response = response.json()
+        # print(response)
+        if "error" in response:
+            return None
         ACCESS_TOKEN = response["access_token"]
         return ACCESS_TOKEN
+    # execute this code when false
     else:
         actual_time = datetime.now()
         if (LAST_TIME_REFRESH - actual_time).seconds > 3500:
+
             new_token = refreshed_token(True)
             return new_token
         else:
@@ -104,20 +131,50 @@ def get_currently_played():
 
     payload = {}
     headers = {
-        'Authorization': f'Bearer {request.get_header("token")}',
+        'Authorization': f'Bearer {refreshed_token()}',
         'Access-Control-allow-Origin': '*'
     }
-
+    print(refreshed_token())
     response = requests.request("GET", url, headers=headers, data=payload)
+    print(response)
     response.headers["Access-Control-Allow-Origin"] = "*"
     response = response.text
+    print(response)
     return json.loads(response)
 
 
 
-@route('/static/<filename>')
+@route('/<filename>')
 def get_static(filename):
     return static_file(filename, root='music_player')
+
+
+@route("/")
+def get_started():
+    return static_file("step_1.html", root="spotify/steps")
+
+
+
+@route('/static_spotify/<filename>')
+def get_static(filename):
+    return static_file(filename, root="spotify/steps")
+
+
+@route("/callbackspotify")
+def get_callback_spotify():
+    return static_file("step_2.html", root="spotify/steps")
+
+
+@route("/store_informations")
+def store_informations():
+    print("JE SUIS DANS LE PRINT INFORMATION DU TEXTE")
+    refresh_token = request.get_header("token")
+    client_id = request.get_header("client_id")
+    spotify_base_64 = request.get_header("Spotify_base_64")
+    write_files("informations.txt", [refresh_token, client_id, spotify_base_64],
+                ["refresh_token", "client_id", "spotify_base_64"])
+    return f"informations received"
+
 
 
 def run_server():
