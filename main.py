@@ -1,9 +1,14 @@
 import asyncio
 from twitch_pubsub.webSocketClient import WebSocketClient
-
+import os
+import time
 if __name__ == "__main__":
 
     # Creating client object
+    file_created = False
+    while not file_created:
+        file_created = os.path.isfile("twitch_pubsub/broadcaster_id_informations.txt") and os.path.isfile("twitch_pubsub/twitch_access_token_informations.txt")
+        time.sleep(5)
     client = WebSocketClient()
     loop = asyncio.get_event_loop()
     # Start connection and get client connection protocol
@@ -15,3 +20,4 @@ if __name__ == "__main__":
     ]
 
     loop.run_until_complete(asyncio.wait(tasks))
+

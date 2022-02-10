@@ -61,7 +61,7 @@ function storeInformations(response){
         redirect: 'follow'
     };
 
-    fetch("http://localhost:8080/store_informations", requestOptions)
+    fetch("http://localhost:8080/store_informations_spotify", requestOptions)
         .then(response => response.text())
         .then(result => window.location = "http://localhost:8080/index.html")
         .catch(error => console.log('error', error));

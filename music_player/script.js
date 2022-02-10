@@ -25,7 +25,7 @@ function retrieveInformation() {
     redirect: 'follow'
   };
 
-  fetch("http://localhost:8080/informations.txt", requestOptions)
+  fetch("http://localhost:8080/spotify_informations.txt", requestOptions)
       .then(response => response.text())
       .then(result => storeInformations(result))
       .catch(error => console.log('error', error));

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="static_twitch/script.js"></script>
+</head>
+<body>
+<p> Go to https://dev.twitch.tv/console/apps/, Log in then on the right side go to " Register Your application.
+Give it whatever name you want, spotify integration for example,
+in the OAuth redirect URLs enter this exact value : http://localhost:5050/twitchCallback and click ADD,
+hen in the Category select Website Integration and hit Create.
+
+    then select your application and copy the Client ID field, and past it below
+
+
+    <label for="twitch-id">Twitch client id:</label><br>
+
+    <input type="text" id="twitch-id" name="twitch-id"><br>
+
+     <button type="submit" onclick="sendForm()">Submit</button>
+</p>
+</body>
+</html>

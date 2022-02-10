@@ -9,30 +9,31 @@ from threading import Thread
 
 load_dotenv()
 
-# BASIC64_AUTHORIZATION = os.getenv("BASIC64_AUTHORIZATION")
-# REFRESH_TOKEN = os.getenv("REFRESH_TOKEN")
-# SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 ACCESS_TOKEN = None
 LAST_TIME_REFRESH = None
 
 
 def write_files(filename, values, keys):
-    with open("music_player/" + filename, "w") as f:
-        for i in range(len(values)):
-            f.write(keys[i] + ";" + values[i] + "\n")
-        f.close()
+    if not os.path.isfile(filename):
+        with open(filename, "w") as f:
+            for i in range(len(values)):
+                f.write(keys[i] + ";" + values[i] + "\n")
+            f.close()
 
-
-def read_informations(key):
+#todo changer l'open et la mettre en parametre puis lire les valeur et les balancer dans le websocket
+def read_informations(filename, key):
     informations = {}
-    with open("music_player/informations.txt", 'r') as f:
-        for line in f:
-            split_line = line.split(";")
-            if len(split_line) == 2:
-                informations[split_line[0]] = split_line[1].strip("\n")
-        f.close()
-        if key in informations:
-            return informations[key]
+    if os.path.isfile(filename):
+        with open(filename, 'r') as f:
+            for line in f:
+                split_line = line.split(";")
+                if len(split_line) == 2:
+                    informations[split_line[0]] = split_line[1].strip("\n")
+            f.close()
+            if key in informations:
+                return informations[key]
+            return None
+    else:
         return None
 
 
@@ -45,15 +46,12 @@ def refreshed_token(is_init=True):
         LAST_TIME_REFRESH = datetime.now()
         url = "https://accounts.spotify.com/api/token"
 
-        payload = f'grant_type=refresh_token&refresh_token={read_informations("refresh_token")}' \
-                  f'&client_id={read_informations("client_id")}'
+        payload = f'grant_type=refresh_token&refresh_token={read_informations("music_player/spotify_informations.txt" ,"refresh_token")}' \
+                  f'&client_id={read_informations("music_player/spotify_informations.txt" ,"client_id")}'
         headers = {
-            'Authorization': f'Basic {read_informations("spotify_base_64")}',
+            'Authorization': f'Basic {read_informations("music_player/spotify_informations.txt" ,"spotify_base_64")}',
             'Content-Type': 'application/x-www-form-urlencoded'
         }
-        # print(read_informations("client_id"))
-        # print(read_informations("refresh_token"))
-        # print(read_informations("spotify_base_64"))
         response = requests.request("POST", url, headers=headers, data=payload)
         response = response.json()
         # print(response)
@@ -154,7 +152,6 @@ def get_started():
     return static_file("step_1.html", root="spotify/steps")
 
 
-
 @route('/static_spotify/<filename>')
 def get_static(filename):
     return static_file(filename, root="spotify/steps")
@@ -165,15 +162,39 @@ def get_callback_spotify():
     return static_file("step_2.html", root="spotify/steps")
 
 
-@route("/store_informations")
-def store_informations():
-    print("JE SUIS DANS LE PRINT INFORMATION DU TEXTE")
+@route('/static_twitch/<filename>')
+def get_static_twitch(filename):
+    return static_file(filename, root="twitch/steps")
+
+
+@route("/twitch")
+def get_started_twitch():
+    return static_file("step_1.html", root="twitch/steps")
+
+
+@route("/callbacktwitch")
+def get_callback_twitch():
+    return static_file("step_2.html", root="twitch/steps")
+
+
+@route("/store_informations_spotify")
+def store_informations_spotify():
     refresh_token = request.get_header("token")
     client_id = request.get_header("client_id")
     spotify_base_64 = request.get_header("Spotify_base_64")
-    write_files("informations.txt", [refresh_token, client_id, spotify_base_64],
+    write_files("music_player/spotify_informations.txt",
+                [refresh_token, client_id, spotify_base_64],
                 ["refresh_token", "client_id", "spotify_base_64"])
-    return f"informations received"
+    return f"informations from spotify received"
+
+
+@route("/store_informations_twitch")
+def store_informations_twitch():
+    reward_id = request.get_header("rewardId")
+    reward_type = request.get_header("rewardType")
+    write_files(f"twitch_pubsub/{reward_type}_informations.txt", [reward_id],
+                ["Id"])
+    return f"informations from twitch received"
 
 
 
