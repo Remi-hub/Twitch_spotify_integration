@@ -13,8 +13,8 @@ ACCESS_TOKEN = None
 LAST_TIME_REFRESH = None
 
 
-def write_files(filename, values, keys):
-    if not os.path.isfile(filename):
+def write_files(filename, values, keys, overwrite=False):
+    if not os.path.isfile(filename) or overwrite == True:
         with open(filename, "w") as f:
             for i in range(len(values)):
                 f.write(keys[i] + ";" + values[i] + "\n")

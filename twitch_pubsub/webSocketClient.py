@@ -5,6 +5,7 @@ import json
 import os
 from dotenv import load_dotenv
 from spotify import spotify
+import requests
 
 load_dotenv()
 
@@ -39,6 +40,7 @@ class WebSocketClient:
         # list of topics to subscribe to
         self.topics = [f"channel-points-channel-v1.{spotify.read_informations('twitch_pubsub/broadcaster_id_informations.txt', 'Id')}"]
         self.auth_token = f"{spotify.read_informations('twitch_pubsub/twitch_access_token_informations.txt', 'Id')}"
+        print(spotify.read_informations('twitch_pubsub/twitch_access_token_informations.txt', 'Id'))
 
 
     async def connect(self):
@@ -77,7 +79,13 @@ class WebSocketClient:
             try:
                 message = await connection.recv()
                 print("Received message from server: " + str(message))
+
+
                 response = json.loads(message)
+                print("LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+                # if "error" in response:
+                #     await refreshed_access_token()
+                #     self.auth_token = {spotify.read_informations('twitch_pubsub/twitch_access_token_informations.txt', 'Id')}
 
                 if "data" in response:
                     message_in_response = response["data"]["message"]
@@ -118,3 +126,29 @@ class WebSocketClient:
             except websockets.exceptions.ConnectionClosed:
                 print("Connection with server closed")
                 break
+
+
+# #todo créer ou recuperer le refresh token(voir refresh token fait en JS)
+def refreshed_access_token():
+    url = f"https://id.twitch.tv/oauth2/token?" \
+          f"client_id={spotify.read_informations('twitch_pubsub/twitch_id_informations.txt', 'Id')}" \
+          f"&client_secret={spotify.read_informations('twitch_pubsub/twitch_secret_informations.txt', 'Id')}" \
+          f"&grant_type=refresh_token" \
+          f"&refresh_token={spotify.read_informations('twitch_pubsub/twitch_refresh_token_informations.txt', 'Id')}" \
+          f"&scope={spotify.read_informations('twitch_pubsub/twitch_scopes_informations.txt', 'Id')}"
+
+    payload = {}
+    headers = {}
+    print("voici le refresh token LLLLLLLLLLL")
+    print(spotify.read_informations('twitch_pubsub/twitch_refresh_token_informations.txt', 'Id'))
+    response = requests.request("POST", url, headers=headers, data=payload)
+    print("ceci est le refreshed access token")
+    response = response.text
+    response = json.loads(response)
+    refreshed_access_token = response["access_token"]
+    print(refreshed_access_token)
+    spotify.write_files("twitch_pubsub/twitch_access_token_informations.txt", [refreshed_access_token], ["Id"], True)
+
+
+
+#todo renommer les fichiers mp3, et peut etre dev une interface pour selectionner des presets de son

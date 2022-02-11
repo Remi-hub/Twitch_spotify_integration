@@ -3,6 +3,7 @@ let twitchId;
 let twitchSecret;
 let channelName;
 let twitchAccessToken;
+let twitchRefreshToken;
 let broadcasterId;
 
 
@@ -30,6 +31,9 @@ function storeInformations(response){
     let responseJSON = JSON.parse(response)
     console.log("JE SUIS DANS STORE INFO LA")
     console.log(responseJSON["access_token"])
+    twitchRefreshToken = responseJSON["refresh_token"]
+    // todo recup le refresh token
+    console.log(responseJSON["refresh_token"])
     twitchAccessToken = responseJSON["access_token"]
     console.log(twitchAccessToken)
 }
@@ -65,7 +69,7 @@ async function getUserId() {
     return fetch(`https://api.twitch.tv/helix/users?login=${channelName}`, requestOptions)
         .then(response => response.text())
         .then(function (result){
-            resultJon = JSON.parse(result);
+            let resultJon = JSON.parse(result);
             broadcasterId = resultJon["data"][0]["id"]}
         )
         .catch(error => console.log('error', error));
@@ -124,12 +128,24 @@ async function submit() {
                     storeInformationsInFile(twitchAccessToken, "twitch_access_token")
                 })
                 .then(function (){
+                    storeInformationsInFile(twitchId, "twitch_id")
+                })
+                .then(function (){
+                    storeInformationsInFile(twitchSecret, "twitch_secret")
+                })
+                .then(function (){
+                    storeInformationsInFile(twitchRefreshToken, "twitch_refresh_token")
+                })
+                .then(function (){
+                    storeInformationsInFile(twitchScopes, "twitch_scopes")
+                })
+                .then(function (){
                     storeInformationsInFile(broadcasterId, "broadcaster_id")
                 })
-                // todo redirect sur une page daccueil
-                // .then(function () {
-                //     window.location = "http://localhost:8080/"
-                // })
+            // todo redirect sur une page daccueil
+            // .then(function () {
+            //     window.location = "http://localhost:8080/"
+            // })
         })
     })
 }
