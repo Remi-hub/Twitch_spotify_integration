@@ -3,12 +3,15 @@ from twitch_pubsub.webSocketClient import WebSocketClient
 from twitch_pubsub.webSocketClient import refreshed_access_token
 import os
 import time
+
 if __name__ == "__main__":
 
     # Creating client object
     file_created = False
     while not file_created:
-        file_created = os.path.isfile("twitch_pubsub/broadcaster_id_informations.txt") and os.path.isfile("twitch_pubsub/twitch_access_token_informations.txt")
+        file_created = os.path.isfile(
+            "twitch_pubsub/broadcaster_id_informations.txt"
+        ) and os.path.isfile("twitch_pubsub/twitch_access_token_informations.txt")
         time.sleep(5)
     counter = 0
     while True:

@@ -120,35 +120,42 @@ async function submit() {
                 .then(function(rewardId) {
                     storeInformationsInFile(rewardId, "Request_Song")
                 })
-            createCustomReward(twitchId, twitchAccessToken, "Skip current song", "50", false)
-                .then(function(rewardId) {
-                    storeInformationsInFile(rewardId, "Skip_current_song")
+                .then(function() {
+                    createCustomReward(twitchId, twitchAccessToken, "Skip current song", "50", false)
+                        .then(function(rewardId) {
+                            storeInformationsInFile(rewardId, "Skip_current_song")
+                        })
+                        .then(function (){
+                            storeInformationsInFile(twitchAccessToken, "twitch_access_token")
+                        })
+                        .then(function (){
+                            storeInformationsInFile(twitchId, "twitch_id")
+                        })
+                        .then(function (){
+                            storeInformationsInFile(twitchSecret, "twitch_secret")
+                        })
+                        .then(function (){
+                            storeInformationsInFile(twitchRefreshToken, "twitch_refresh_token")
+                        })
+                        .then(function (){
+                            storeInformationsInFile(twitchScopes, "twitch_scopes")
+                        })
+                        .then(function (){
+                            storeInformationsInFile(broadcasterId, "broadcaster_id")
+
+                        })
+
                 })
-                .then(function (){
-                    storeInformationsInFile(twitchAccessToken, "twitch_access_token")
-                })
-                .then(function (){
-                    storeInformationsInFile(twitchId, "twitch_id")
-                })
-                .then(function (){
-                    storeInformationsInFile(twitchSecret, "twitch_secret")
-                })
-                .then(function (){
-                    storeInformationsInFile(twitchRefreshToken, "twitch_refresh_token")
-                })
-                .then(function (){
-                    storeInformationsInFile(twitchScopes, "twitch_scopes")
-                })
-                .then(function (){
-                    storeInformationsInFile(broadcasterId, "broadcaster_id")
-                })
-            // todo redirect sur une page daccueil
-            // .then(function () {
-            //     window.location = "http://localhost:8080/"
-            // })
+
         })
     })
+// // todo la redirect ne doit se faire qu'après toutes les informations créer (txt)
+//  .then(function () {
+//                             window.location = "http://localhost:8080/"
+//                         })
 }
+
+
 
 
 function storeInformationsInFile(information, filename){

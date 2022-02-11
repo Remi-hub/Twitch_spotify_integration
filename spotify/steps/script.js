@@ -74,8 +74,10 @@ async function submit() {
     let codeBase64 = encodeBase64(spotifyId, spotifySecret);
     SpotifyBase64Code = codeBase64;
     SpotifyClientID = spotifyId;
-    await requestAccessAndRefreshTokenSpotify(codeBase64, spotifyCode);
-    console.log()
-
+    await requestAccessAndRefreshTokenSpotify(codeBase64, spotifyCode)
+        .then(function(){
+            window.location = "http://localhost:8080/"
+        })
 }
 
+// todo gerer le lecteur en pause

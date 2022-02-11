@@ -20,11 +20,12 @@ def write_files(filename, values, keys, overwrite=False):
                 f.write(keys[i] + ";" + values[i] + "\n")
             f.close()
 
-#todo changer l'open et la mettre en parametre puis lire les valeur et les balancer dans le websocket
+
+# todo changer l'open et la mettre en parametre puis lire les valeur et les balancer dans le websocket
 def read_informations(filename, key):
     informations = {}
     if os.path.isfile(filename):
-        with open(filename, 'r') as f:
+        with open(filename, "r") as f:
             for line in f:
                 split_line = line.split(";")
                 if len(split_line) == 2:
@@ -46,11 +47,13 @@ def refreshed_token(is_init=True):
         LAST_TIME_REFRESH = datetime.now()
         url = "https://accounts.spotify.com/api/token"
 
-        payload = f'grant_type=refresh_token&refresh_token={read_informations("music_player/spotify_informations.txt" ,"refresh_token")}' \
-                  f'&client_id={read_informations("music_player/spotify_informations.txt" ,"client_id")}'
+        payload = (
+            f'grant_type=refresh_token&refresh_token={read_informations("music_player/spotify_informations.txt" ,"refresh_token")}'
+            f'&client_id={read_informations("music_player/spotify_informations.txt" ,"client_id")}'
+        )
         headers = {
-            'Authorization': f'Basic {read_informations("music_player/spotify_informations.txt" ,"spotify_base_64")}',
-            'Content-Type': 'application/x-www-form-urlencoded'
+            "Authorization": f'Basic {read_informations("music_player/spotify_informations.txt" ,"spotify_base_64")}',
+            "Content-Type": "application/x-www-form-urlencoded",
         }
         response = requests.request("POST", url, headers=headers, data=payload)
         response = response.json()
@@ -118,19 +121,18 @@ def add_track_to_playback(song_uri):
 
 def play_music_requested(user_input):
     add_track_to_playback(
-
         get_track_uri(user_input),
     )
 
 
-@route('/currently_playing')
+@route("/currently_playing")
 def get_currently_played():
     url = "https://api.spotify.com/v1/me/player/currently-playing"
 
     payload = {}
     headers = {
-        'Authorization': f'Bearer {refreshed_token()}',
-        'Access-Control-allow-Origin': '*'
+        "Authorization": f"Bearer {refreshed_token()}",
+        "Access-Control-allow-Origin": "*",
     }
     print(refreshed_token())
     response = requests.request("GET", url, headers=headers, data=payload)
@@ -141,18 +143,22 @@ def get_currently_played():
     return json.loads(response)
 
 
-
-@route('/<filename>')
+@route("/<filename>")
 def get_static(filename):
-    return static_file(filename, root='music_player')
+    return static_file(filename, root="music_player")
 
 
 @route("/")
 def get_started():
+    return static_file("home.html", root="")
+
+
+@route("/spotify")
+def get_started_spotify():
     return static_file("step_1.html", root="spotify/steps")
 
 
-@route('/static_spotify/<filename>')
+@route("/static_spotify/<filename>")
 def get_static(filename):
     return static_file(filename, root="spotify/steps")
 
@@ -162,7 +168,7 @@ def get_callback_spotify():
     return static_file("step_2.html", root="spotify/steps")
 
 
-@route('/static_twitch/<filename>')
+@route("/static_twitch/<filename>")
 def get_static_twitch(filename):
     return static_file(filename, root="twitch/steps")
 
@@ -182,9 +188,11 @@ def store_informations_spotify():
     refresh_token = request.get_header("token")
     client_id = request.get_header("client_id")
     spotify_base_64 = request.get_header("Spotify_base_64")
-    write_files("music_player/spotify_informations.txt",
-                [refresh_token, client_id, spotify_base_64],
-                ["refresh_token", "client_id", "spotify_base_64"])
+    write_files(
+        "music_player/spotify_informations.txt",
+        [refresh_token, client_id, spotify_base_64],
+        ["refresh_token", "client_id", "spotify_base_64"],
+    )
     return f"informations from spotify received"
 
 
@@ -192,14 +200,12 @@ def store_informations_spotify():
 def store_informations_twitch():
     reward_id = request.get_header("rewardId")
     reward_type = request.get_header("rewardType")
-    write_files(f"twitch_pubsub/{reward_type}_informations.txt", [reward_id],
-                ["Id"])
+    write_files(f"twitch_pubsub/{reward_type}_informations.txt", [reward_id], ["Id"])
     return f"informations from twitch received"
 
 
-
 def run_server():
-    run(host='localhost', port=8080)
+    run(host="localhost", port=8080)
 
 
 Thread(target=run_server).start()
