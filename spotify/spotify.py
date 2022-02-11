@@ -88,7 +88,7 @@ def get_track_uri(name):
     song_found = response_json["tracks"]["items"]
     if not song_found:
         # play a funny sound if the song is not found
-        playsound.playsound("./media/pas_trouve.mp3")
+        playsound.playsound("./media/not_found_sounds/no_found_sound_1.mp3")
         print("***   No Song found   ***")
     else:
         song_name = response_json["tracks"]["items"][0]["name"]
@@ -107,7 +107,7 @@ def skip_current_track():
     }
 
     response = requests.request("POST", url, headers=headers, data=payload)
-    playsound.playsound("./media/ca_degage.mp3")
+    playsound.playsound("./media/skip_sounds/skip_sound_1.mp3")
 
 
 def add_track_to_playback(song_uri):
