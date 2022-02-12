@@ -22,16 +22,10 @@ def get_user_input(response):
     else:
         return None
 
-
-def print_user_name_and_input(name, input):
-    return print(f"{name} requested {input}")
-
-
 def get_reward_id(response):
     message_in_response = response["data"]["message"]
     message_in_response = json.loads(message_in_response)
     reward_id = message_in_response["data"]["redemption"]["reward"]["id"]
-    print(reward_id)
     return reward_id
 
 
@@ -85,10 +79,6 @@ class WebSocketClient:
                 print("Received message from server: " + str(message))
 
                 response = json.loads(message)
-                print("LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
-                # if "error" in response:
-                #     await refreshed_access_token()
-                #     self.auth_token = {spotify.read_informations('twitch_pubsub/twitch_access_token_informations.txt', 'Id')}
 
                 if "data" in response:
                     message_in_response = response["data"]["message"]
@@ -102,8 +92,6 @@ class WebSocketClient:
                     if claimed_reward_id == spotify.read_informations(
                         "twitch_pubsub/Request_Song_informations.txt", "Id"
                     ):
-                        print("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
-                        print(claimed_reward_id)
                         print(
                             spotify.read_informations(
                                 "Request_Song_informations.txt", "Id"
@@ -132,7 +120,6 @@ class WebSocketClient:
             try:
                 data_set = {"type": "PING"}
                 json_request = json.dumps(data_set)
-                # print(json_request)
                 await connection.send(json_request)
                 await asyncio.sleep(60)
             except websockets.exceptions.ConnectionClosed:
@@ -140,7 +127,7 @@ class WebSocketClient:
                 break
 
 
-# #todo créer ou recuperer le refresh token(voir refresh token fait en JS)
+
 def refreshed_access_token():
     url = (
         f"https://id.twitch.tv/oauth2/token?"
@@ -153,18 +140,15 @@ def refreshed_access_token():
 
     payload = {}
     headers = {}
-    print("voici le refresh token LLLLLLLLLLL")
     print(
         spotify.read_informations(
             "twitch_pubsub/twitch_refresh_token_informations.txt", "Id"
         )
     )
     response = requests.request("POST", url, headers=headers, data=payload)
-    print("ceci est le refreshed access token")
     response = response.text
     response = json.loads(response)
     refreshed_access_token = response["access_token"]
-    print(refreshed_access_token)
     spotify.write_files(
         "twitch_pubsub/twitch_access_token_informations.txt",
         [refreshed_access_token],
@@ -172,5 +156,3 @@ def refreshed_access_token():
         True,
     )
 
-
-# todo renommer les fichiers mp3, et peut etre dev une interface pour selectionner des presets de son

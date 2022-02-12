@@ -21,7 +21,7 @@ def write_files(filename, values, keys, overwrite=False):
             f.close()
 
 
-# todo changer l'open et la mettre en parametre puis lire les valeur et les balancer dans le websocket
+
 def read_informations(filename, key):
     informations = {}
     if os.path.isfile(filename):
@@ -57,7 +57,6 @@ def refreshed_token(is_init=True):
         }
         response = requests.request("POST", url, headers=headers, data=payload)
         response = response.json()
-        # print(response)
         if "error" in response:
             return None
         ACCESS_TOKEN = response["access_token"]
@@ -134,12 +133,10 @@ def get_currently_played():
         "Authorization": f"Bearer {refreshed_token()}",
         "Access-Control-allow-Origin": "*",
     }
-    print(refreshed_token())
     response = requests.request("GET", url, headers=headers, data=payload)
-    print(response)
     response.headers["Access-Control-Allow-Origin"] = "*"
     response = response.text
-    print(response)
+
     return json.loads(response)
 
 

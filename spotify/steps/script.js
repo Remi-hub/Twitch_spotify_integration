@@ -79,5 +79,3 @@ async function submit() {
             window.location = "http://localhost:8080/"
         })
 }
-
-// todo gerer le lecteur en pause
