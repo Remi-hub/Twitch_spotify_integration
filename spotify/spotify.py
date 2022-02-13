@@ -1,13 +1,12 @@
 import json
 import requests
-from dotenv import load_dotenv
-import os
 import playsound
 from bottle import route, run, static_file, request
 from datetime import datetime
 from threading import Thread
+import os
 
-load_dotenv()
+
 
 ACCESS_TOKEN = None
 LAST_TIME_REFRESH = None
@@ -75,6 +74,25 @@ def refreshed_token(is_init=True):
 refreshed_token(True)
 
 
+def refund_redemption():
+    url = f"https://api.twitch.tv/helix/channel_points/custom_rewards/redemptions" \
+          f"?id={read_informations('twitch_pubsub/redemption_reward_id.txt', 'Id')}" \
+          f"&broadcaster_id={read_informations('twitch_pubsub/broadcaster_id_informations.txt', 'Id')}" \
+          f"&reward_id={read_informations('twitch_pubsub/claimed_reward_id.txt', 'Id')}"
+
+    payload = 'status=CANCELED'
+    headers = {
+        'client-id': read_informations("twitch_pubsub/twitch_id_informations.txt", "Id"),
+        'Authorization': f'Bearer {read_informations("twitch_pubsub/twitch_access_token_informations.txt", "Id")}',
+        'Content-Type': 'application/x-www-form-urlencoded',
+    }
+
+    response = requests.request("PATCH", url, headers=headers, data=payload)
+    print('reponse du refund')
+    print(response.text)
+
+
+
 def get_track_uri(name):
     """take the name of a song and return its uri"""
     url = f"https://api.spotify.com/v1/search?q={name}&type=track"
@@ -88,6 +106,7 @@ def get_track_uri(name):
     if not song_found:
         # play a funny sound if the song is not found
         playsound.playsound("./media/not_found_sounds/no_found_sound_1.mp3")
+        refund_redemption()
         print("***   No Song found   ***")
     else:
         song_name = response_json["tracks"]["items"][0]["name"]
@@ -123,6 +142,8 @@ def play_music_requested(user_input):
         get_track_uri(user_input),
     )
 
+
+####### local server ######
 
 @route("/currently_playing")
 def get_currently_played():

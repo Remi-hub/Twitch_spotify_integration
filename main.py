@@ -25,7 +25,5 @@ if __name__ == "__main__":
             asyncio.ensure_future(client.heartbeat(connection)),
             asyncio.ensure_future(client.receiveMessage(connection)),
         ]
-
         loop.run_until_complete(asyncio.wait(tasks))
-
         print("disconnected... reconnecting...")

@@ -2,15 +2,8 @@ import websockets
 import asyncio
 import uuid
 import json
-import os
-from dotenv import load_dotenv
 from spotify import spotify
 import requests
-
-load_dotenv()
-
-TWITCH_TOKEN = os.getenv("TWITCH_TOKEN")
-CHANNEL_ID = os.getenv("CHANNEL_ID")
 
 
 def get_user_input(response):
@@ -36,11 +29,7 @@ class WebSocketClient:
             f"channel-points-channel-v1.{spotify.read_informations('twitch_pubsub/broadcaster_id_informations.txt', 'Id')}"
         ]
         self.auth_token = f"{spotify.read_informations('twitch_pubsub/twitch_access_token_informations.txt', 'Id')}"
-        print(
-            spotify.read_informations(
-                "twitch_pubsub/twitch_access_token_informations.txt", "Id"
-            )
-        )
+
 
     async def connect(self):
         """
@@ -76,35 +65,30 @@ class WebSocketClient:
         while True:
             try:
                 message = await connection.recv()
-                print("Received message from server: " + str(message))
+                # print("Received message from server: " + str(message))
 
                 response = json.loads(message)
+
+                print(response)
 
                 if "data" in response:
                     message_in_response = response["data"]["message"]
                     message_in_response = json.loads(message_in_response)
-                    claimed_reward_id = message_in_response["data"]["redemption"][
-                        "reward"
-                    ]["id"]
+                    claimed_reward_id = message_in_response["data"]["redemption"]["reward"]["id"]
+                    redemption_reward_id = message_in_response["data"]["redemption"]["id"]
+                    spotify.write_files("twitch_pubsub/claimed_reward_id.txt", [claimed_reward_id],["Id"], True)
+                    spotify.write_files("twitch_pubsub/redemption_reward_id.txt", [redemption_reward_id],["Id"], True)
                     # if the requested id matches the following ids:
-
                     # play requested song :
                     if claimed_reward_id == spotify.read_informations(
                         "twitch_pubsub/Request_Song_informations.txt", "Id"
                     ):
-                        print(
-                            spotify.read_informations(
-                                "Request_Song_informations.txt", "Id"
-                            )
-                        )
-                        # if claimed_reward_id == "86fab6d6-09f5-4506-a172-9dfb2a750aae":
                         spotify.play_music_requested(get_user_input(response))
 
                     # skip the current song :
                     elif claimed_reward_id == spotify.read_informations(
                         "twitch_pubsub/Skip_current_song_informations.txt", "Id"
                     ):
-                        # elif claimed_reward_id == "3d9b655e-9ddc-483a-9891-488ce9883ac7":
                         spotify.skip_current_track()
 
             except websockets.exceptions.ConnectionClosed:
@@ -140,11 +124,7 @@ def refreshed_access_token():
 
     payload = {}
     headers = {}
-    print(
-        spotify.read_informations(
-            "twitch_pubsub/twitch_refresh_token_informations.txt", "Id"
-        )
-    )
+
     response = requests.request("POST", url, headers=headers, data=payload)
     response = response.text
     response = json.loads(response)
@@ -155,4 +135,5 @@ def refreshed_access_token():
         ["Id"],
         True,
     )
+
 

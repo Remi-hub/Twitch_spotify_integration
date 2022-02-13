@@ -76,6 +76,7 @@ async function submit() {
     SpotifyClientID = spotifyId;
     await requestAccessAndRefreshTokenSpotify(codeBase64, spotifyCode)
         .then(function(){
+            window.alert("connection established, you'll be redirected to the home page")
             window.location = "http://localhost:8080/"
         })
 }

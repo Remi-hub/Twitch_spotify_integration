@@ -20,7 +20,7 @@
 	justify-content: center;
 	align-items: center;
 	width: 175px;
-	background-color: #2C3333;
+	background-color: #B8405E;
 
 }
 
@@ -118,7 +118,7 @@ h3 {
 #bar-progress {
 	position: absolute;
 	width: 250px;
-	background-color: #395B64;
+	background-color: #313552;
 	height: 100px;
 	border-radius: 0 5% 5% 0;
 }
@@ -127,7 +127,7 @@ h3 {
 	z-index: 5;
 	width: 1%;
 	height: 100px;
-	background-color: #2C3333;
+	background-color: #B8405E;
 	border-radius: 0 5% 5% 0;
 }
 

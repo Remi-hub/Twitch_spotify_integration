@@ -2,3 +2,7 @@ This project is for twitch streamer, it allows your viewers to redeem a channel 
 It also contains a music player that you can display on your stream
 
 Check out the env_template to know how to setup your env properly
+
+
+---------------------
+
