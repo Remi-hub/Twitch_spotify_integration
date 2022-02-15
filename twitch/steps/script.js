@@ -78,7 +78,8 @@ function getUserId () {
 
 
 // create a custom reward and return its ID
-function createCustomReward(rewardTitle, RewardCost, inputRequired) {
+function createCustomReward(rewardTitle, RewardCost, inputRequired,
+                            Cooldown, cooldown_seconds) {
     return new Promise(async function (resolve, reject) {
         let myHeaders = new Headers();
         myHeaders.append("Client-Id", twitchId);
@@ -89,6 +90,8 @@ function createCustomReward(rewardTitle, RewardCost, inputRequired) {
         urlencoded.append("title", rewardTitle);
         urlencoded.append("cost", RewardCost);
         urlencoded.append("is_user_input_required", inputRequired);
+        urlencoded.append("is_global_cooldown_enabled", Cooldown);
+        urlencoded.append("global_cooldown_seconds", cooldown_seconds);
 
         let requestOptions = {
             method: 'POST',
@@ -126,7 +129,7 @@ async function submit() {
     await promiseGetUserId;
     console.log(promiseGetUserId);
 
-    let promiseCreateRequestReward = createCustomReward("Request Song", 100, true);
+    let promiseCreateRequestReward = createCustomReward("Request Song", 100, true, true, 20);
     await promiseCreateRequestReward.then(async function(rewardId){
         let promiseInformationsInFile = storeInformationsInFile(rewardId, "Request_Song")
         await promiseInformationsInFile;
@@ -134,7 +137,7 @@ async function submit() {
     });
     console.log(promiseCreateRequestReward)
 
-    let promiseCreateSkipReward = createCustomReward("Skip Current Song", 50, false);
+    let promiseCreateSkipReward = createCustomReward("Skip Current Song", 50, false, true, 30);
     await promiseCreateSkipReward.then(async function (rewardId){
         let promiseInformationsInFile = storeInformationsInFile(rewardId, "Skip_current_song")
         await promiseInformationsInFile;
@@ -149,7 +152,7 @@ async function submit() {
         [twitchRefreshToken, "twitch_refresh_token"],
         [twitchScopes, "twitch_scopes"],
         [broadcasterId, "broadcaster_id"]
-        ]
+    ]
 
     for(let i = 0; i < listToStore.length; i++) {
         let storeInformationPromise = await storeInformationsInFile(listToStore[i][0],listToStore[i][1]);
